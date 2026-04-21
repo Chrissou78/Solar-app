@@ -1,114 +1,139 @@
 'use client'
-
-interface CalendarDay {
-  date: string
-  production: number
-  expected: number
-  dayOfMonth: number
-}
+import { useMemo } from 'react'
+import { TrendingUp } from 'lucide-react'
 
 interface PerformanceCalendarProps {
-  data: CalendarDay[]
+  data: Array<{
+    date: string
+    production: number
+    expected: number
+  }>
 }
 
 export default function PerformanceCalendar({ data }: PerformanceCalendarProps) {
-  if (data.length === 0) {
-    return (
-      <div style={{
-        backgroundColor: 'var(--bg-secondary)',
-        borderColor: 'var(--border-color)',
-      }} className="rounded-xl border p-6">
-        <h3 className="text-lg font-semibold mb-4">Performance Calendar</h3>
-        <p style={{ color: 'var(--text-secondary)' }}>No data available</p>
-      </div>
-    )
+  const calendarData = useMemo(() => {
+    const today = new Date()
+    const days = []
+    
+    // Get last 42 days (6 weeks)
+    for (let i = 41; i >= 0; i--) {
+      const date = new Date(today)
+      date.setDate(date.getDate() - i)
+      const dateStr = date.toISOString().split('T')[0]
+      const dayData = data.find(d => d.date === dateStr) || { production: 0, expected: 0, date: dateStr }
+      days.push({
+        date: dateStr,
+        production: dayData.production,
+        expected: dayData.expected,
+        dayOfWeek: date.toLocaleDateString('en-US', { weekday: 'short' }).charAt(0),
+        dayOfMonth: date.getDate(),
+      })
+    }
+    
+    return days
+  }, [data])
+
+  const getColor = (production: number, expected: number) => {
+    if (production === 0) return 'bg-gray-200 dark:bg-gray-700'
+    const ratio = production / expected
+    if (ratio >= 1) return 'bg-green-500 dark:bg-green-600'
+    if (ratio >= 0.8) return 'bg-blue-500 dark:bg-blue-600'
+    if (ratio >= 0.6) return 'bg-yellow-500 dark:bg-yellow-600'
+    return 'bg-red-500 dark:bg-red-600'
   }
 
-  // Group by weeks
-  const weeks: CalendarDay[][] = []
-  let currentWeek: CalendarDay[] = []
+  const weekLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const weeks = []
   
-  data.forEach((day) => {
-    currentWeek.push(day)
-    if (currentWeek.length === 7) {
-      weeks.push(currentWeek)
-      currentWeek = []
-    }
-  })
-  if (currentWeek.length > 0) weeks.push(currentWeek)
-
-  const getIntensity = (production: number, expected: number) => {
-    const ratio = expected > 0 ? production / expected : 0
-    if (ratio >= 0.9) return '#10b981' // Green - excellent
-    if (ratio >= 0.75) return '#3b82f6' // Blue - good
-    if (ratio >= 0.6) return '#f59e0b' // Amber - fair
-    return '#ef4444' // Red - low
+  for (let i = 0; i < calendarData.length; i += 7) {
+    weeks.push(calendarData.slice(i, i + 7))
   }
 
   return (
-    <div style={{
-      backgroundColor: 'var(--bg-secondary)',
-      borderColor: 'var(--border-color)',
-    }} className="rounded-xl border p-6">
-      <h3 className="text-lg font-semibold mb-6">Performance Calendar</h3>
-      
-      <div className="space-y-4">
-        {weeks.map((week, weekIdx) => (
-          <div key={weekIdx} className="flex gap-2">
-            {week.map((day) => {
-              const intensity = getIntensity(day.production, day.expected)
-              return (
-                <div
-                  key={day.date}
-                  style={{
-                    backgroundColor: intensity,
-                    opacity: 0.7,
-                  }}
-                  className="flex-1 aspect-square rounded-lg flex items-center justify-center cursor-pointer hover:opacity-100 transition group relative"
-                  title={`${day.date}: ${day.production.toFixed(1)} kWh`}
-                >
-                  <span className="text-xs font-semibold text-white">
-                    {day.dayOfMonth}
-                  </span>
-                  
-                  {/* Tooltip */}
-                  <div
-                    style={{
-                      backgroundColor: 'var(--bg-secondary)',
-                      borderColor: 'var(--border-color)',
-                    }}
-                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-slate-800 p-2 rounded hidden group-hover:block whitespace-nowrap text-xs border"
-                  >
-                    <p className="font-semibold">{day.date}</p>
-                    <p>{day.production.toFixed(1)} kWh</p>
-                    <p style={{ color: 'var(--text-secondary)' }} className="text-xs">
-                      Expected: {day.expected.toFixed(1)} kWh
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        ))}
+    <div className="rounded-xl border p-4 bg-white dark:bg-gray-900">
+      <div className="flex items-center gap-2 mb-4">
+        <TrendingUp className="w-5 h-5" style={{ color: 'var(--accent)' }} />
+        <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
+          Production Heatmap (42 days)
+        </h3>
       </div>
 
       {/* Legend */}
-      <div className="flex gap-4 mt-6 text-xs">
+      <div className="flex flex-wrap gap-3 mb-4 text-xs">
         <div className="flex items-center gap-2">
-          <div style={{ backgroundColor: '#10b981', opacity: 0.7 }} className="w-3 h-3 rounded"></div>
-          <span>Excellent (90%+)</span>
+          <div className="w-3 h-3 rounded bg-green-500 dark:bg-green-600"></div>
+          <span style={{ color: 'var(--text-secondary)' }}>≥100%</span>
         </div>
         <div className="flex items-center gap-2">
-          <div style={{ backgroundColor: '#3b82f6', opacity: 0.7 }} className="w-3 h-3 rounded"></div>
-          <span>Good (75-90%)</span>
+          <div className="w-3 h-3 rounded bg-blue-500 dark:bg-blue-600"></div>
+          <span style={{ color: 'var(--text-secondary)' }}>80–99%</span>
         </div>
         <div className="flex items-center gap-2">
-          <div style={{ backgroundColor: '#f59e0b', opacity: 0.7 }} className="w-3 h-3 rounded"></div>
-          <span>Fair (60-75%)</span>
+          <div className="w-3 h-3 rounded bg-yellow-500 dark:bg-yellow-600"></div>
+          <span style={{ color: 'var(--text-secondary)' }}>60–79%</span>
         </div>
         <div className="flex items-center gap-2">
-          <div style={{ backgroundColor: '#ef4444', opacity: 0.7 }} className="w-3 h-3 rounded"></div>
-          <span>Low (&lt;60%)</span>
+          <div className="w-3 h-3 rounded bg-red-500 dark:bg-red-600"></div>
+          <span style={{ color: 'var(--text-secondary)' }}>{"<60%"}</span>
+        </div>
+      </div>
+
+      {/* Calendar Grid */}
+      <div className="overflow-x-auto">
+        <div className="inline-block min-w-full">
+          {/* Day labels */}
+          <div className="flex gap-1 mb-2">
+            {weekLabels.map(day => (
+              <div
+                key={day}
+                className="w-8 h-8 flex items-center justify-center text-xs font-semibold"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Weeks */}
+          {weeks.map((week, weekIdx) => (
+            <div key={weekIdx} className="flex gap-1 mb-1">
+              {week.map(day => (
+                <div
+                  key={day.date}
+                  className={`w-8 h-8 rounded cursor-pointer transition-all hover:ring-2 hover:ring-offset-1 ${getColor(
+                    day.production,
+                    day.expected
+                  )}`}
+                  title={`${day.date}: ${day.production.toFixed(1)} kWh (Expected: ${day.expected.toFixed(1)} kWh)`}
+                  style={{ color: 'white', fontSize: '10px' }}
+                >
+                  {day.production > 0 && (
+                    <div className="flex items-center justify-center h-full font-bold">
+                      {day.dayOfMonth}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="grid grid-cols-2 gap-3 text-xs">
+          <div>
+            <p style={{ color: 'var(--text-secondary)' }}>Avg. Production</p>
+            <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {(calendarData.reduce((sum, d) => sum + d.production, 0) / calendarData.length).toFixed(1)} kWh
+            </p>
+          </div>
+          <div>
+            <p style={{ color: 'var(--text-secondary)' }}>Total Production</p>
+            <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {calendarData.reduce((sum, d) => sum + d.production, 0).toFixed(0)} kWh
+            </p>
+          </div>
         </div>
       </div>
     </div>
