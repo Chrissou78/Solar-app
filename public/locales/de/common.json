@@ -1,0 +1,38 @@
+{
+  "header": {
+    "title": "Virtuelle Energie",
+    "lightMode": "Heller Modus",
+    "darkMode": "Dunkler Modus"
+  },
+  "dashboard": {
+    "welcomeBack": "Willkommen zurück",
+    "todayProduction": "Heutige Produktion",
+    "thisMonth": "Dieser Monat",
+    "monthlySavings": "Monatliche Ersparnisse",
+    "systemStatus": "Systemstatus",
+    "optimal": "Optimal",
+    "allHealthy": "Alle Systeme funktionieren einwandfrei",
+    "realtimeData": "Echtzeitdaten",
+    "fromDatabase": "Aus der Datenbank",
+    "activeAlerts": "Aktive Warnungen",
+    "nextMaintenance": "Nächste Wartung",
+    "needHelp": "Hilfe benötigt?",
+    "chatWithAI": "Chatten Sie mit unserem KI-Assistenten für sofortige Antworten",
+    "scheduleNow": "Jetzt Planen",
+    "chatWithSupport": "Mit Support Chatten",
+    "dismiss": "Verwerfen",
+    "viewDetails": "Details Ansehen",
+    "dueIn": "Fällig in",
+    "days": "Tagen",
+    "productionTrend": "Produktionstrend (Letzte 30 Tage)",
+    "monthlyPerformance": "Monatliche Leistung",
+    "performanceCalendar": "Leistungskalender",
+    "systemEfficiency": "Systemeffizienz",
+    "avgDailyProduction": "Durchschnittliche Tagesproduktion",
+    "capacityFactor": "Kapazitätsfaktor",
+    "totalProduction": "Gesamtproduktion",
+    "actualVsExpected": "Tatsächlich vs. Erwartet",
+    "perDayAverage": "Durchschnitt pro Tag",
+    "systemUtilization": "Systemauslastung"
+  }
+}

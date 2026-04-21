@@ -1,0 +1,38 @@
+{
+  "header": {
+    "title": "Virtual Energy",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode"
+  },
+  "dashboard": {
+    "welcomeBack": "Welcome back",
+    "todayProduction": "Today's Production",
+    "thisMonth": "This Month",
+    "monthlySavings": "Monthly Savings",
+    "systemStatus": "System Status",
+    "optimal": "Optimal",
+    "allHealthy": "All systems healthy",
+    "realtimeData": "Real-time data",
+    "fromDatabase": "From database",
+    "activeAlerts": "Active Alerts",
+    "nextMaintenance": "Next Maintenance",
+    "needHelp": "Need Help?",
+    "chatWithAI": "Chat with our AI assistant for instant answers",
+    "scheduleNow": "Schedule Now",
+    "chatWithSupport": "Chat with Support",
+    "dismiss": "Dismiss",
+    "viewDetails": "View Details",
+    "dueIn": "Due in",
+    "days": "days",
+    "productionTrend": "Production Trend (Last 30 Days)",
+    "monthlyPerformance": "Monthly Performance",
+    "performanceCalendar": "Performance Calendar",
+    "systemEfficiency": "System Efficiency",
+    "avgDailyProduction": "Avg Daily Production",
+    "capacityFactor": "Capacity Factor",
+    "totalProduction": "Total Production",
+    "actualVsExpected": "Actual vs Expected",
+    "perDayAverage": "Per day average",
+    "systemUtilization": "System utilization"
+  }
+}

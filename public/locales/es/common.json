@@ -1,0 +1,38 @@
+{
+  "header": {
+    "title": "Energía Virtual",
+    "lightMode": "Modo Claro",
+    "darkMode": "Modo Oscuro"
+  },
+  "dashboard": {
+    "welcomeBack": "¡Bienvenido de vuelta",
+    "todayProduction": "Producción de Hoy",
+    "thisMonth": "Este Mes",
+    "monthlySavings": "Ahorros Mensuales",
+    "systemStatus": "Estado del Sistema",
+    "optimal": "Óptimo",
+    "allHealthy": "Todos los sistemas saludables",
+    "realtimeData": "Datos en tiempo real",
+    "fromDatabase": "De la base de datos",
+    "activeAlerts": "Alertas Activas",
+    "nextMaintenance": "Próximo Mantenimiento",
+    "needHelp": "¿Necesita ayuda?",
+    "chatWithAI": "Chatea con nuestro asistente de IA para respuestas instantáneas",
+    "scheduleNow": "Programar Ahora",
+    "chatWithSupport": "Chatear con Soporte",
+    "dismiss": "Descartar",
+    "viewDetails": "Ver Detalles",
+    "dueIn": "Vence en",
+    "days": "días",
+    "productionTrend": "Tendencia de Producción (Últimos 30 Días)",
+    "monthlyPerformance": "Rendimiento Mensual",
+    "performanceCalendar": "Calendario de Rendimiento",
+    "systemEfficiency": "Eficiencia del Sistema",
+    "avgDailyProduction": "Producción Diaria Promedio",
+    "capacityFactor": "Factor de Capacidad",
+    "totalProduction": "Producción Total",
+    "actualVsExpected": "Real vs Esperado",
+    "perDayAverage": "Promedio por día",
+    "systemUtilization": "Utilización del sistema"
+  }
+}

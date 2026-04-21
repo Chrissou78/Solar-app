@@ -1,0 +1,38 @@
+{
+  "header": {
+    "title": "Énergie Virtuelle",
+    "lightMode": "Mode Clair",
+    "darkMode": "Mode Sombre"
+  },
+  "dashboard": {
+    "welcomeBack": "Bienvenue",
+    "todayProduction": "Production d'Aujourd'hui",
+    "thisMonth": "Ce Mois",
+    "monthlySavings": "Économies Mensuelles",
+    "systemStatus": "État du Système",
+    "optimal": "Optimal",
+    "allHealthy": "Tous les systèmes en bonne santé",
+    "realtimeData": "Données en temps réel",
+    "fromDatabase": "De la base de données",
+    "activeAlerts": "Alertes Actives",
+    "nextMaintenance": "Prochain Entretien",
+    "needHelp": "Besoin d'aide?",
+    "chatWithAI": "Discutez avec notre assistant IA pour des réponses instantanées",
+    "scheduleNow": "Planifier Maintenant",
+    "chatWithSupport": "Discuter avec le Support",
+    "dismiss": "Rejeter",
+    "viewDetails": "Voir les Détails",
+    "dueIn": "Dû dans",
+    "days": "jours",
+    "productionTrend": "Tendance de Production (30 Derniers Jours)",
+    "monthlyPerformance": "Performance Mensuelle",
+    "performanceCalendar": "Calendrier de Performance",
+    "systemEfficiency": "Efficacité du Système",
+    "avgDailyProduction": "Production Quotidienne Moyenne",
+    "capacityFactor": "Facteur de Capacité",
+    "totalProduction": "Production Totale",
+    "actualVsExpected": "Réel vs Attendu",
+    "perDayAverage": "Moyenne par jour",
+    "systemUtilization": "Utilisation du système"
+  }
+}
