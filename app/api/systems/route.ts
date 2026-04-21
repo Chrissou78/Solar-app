@@ -7,14 +7,12 @@ export async function GET() {
 
     const { data: systems, error } = await supabase
       .from("systems")
-      .select(
-        `
+      .select(`
         *,
         alerts (*),
         maintenance_tasks (*),
         daily_production (*)
-      `
-      )
+      `)
       .limit(1)
 
     if (error) throw error
