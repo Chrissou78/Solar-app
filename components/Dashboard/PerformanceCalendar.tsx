@@ -94,10 +94,10 @@ export default function PerformanceCalendar({ data }: PerformanceCalendarProps) 
         </div>
       </div>
 
-      {/* Calendar Grid - Scrollable */}
+      {/* Calendar Grid - Horizontal Layout */}
       <div className="overflow-x-auto pb-2">
-        <div className="inline-block min-w-full">
-          {/* Day labels */}
+        <div className="inline-block">
+          {/* Week labels row */}
           <div className="flex gap-1 mb-2">
             {weekLabels.map(day => (
               <div
@@ -110,10 +110,10 @@ export default function PerformanceCalendar({ data }: PerformanceCalendarProps) 
             ))}
           </div>
 
-          {/* Weeks Grid */}
-          <div className="flex flex-col gap-1">
+          {/* Weeks displayed horizontally (each week is a row) */}
+          <div className="flex gap-2">
             {weeks.map((week, weekIdx) => (
-              <div key={weekIdx} className="flex gap-1">
+              <div key={weekIdx} className="flex flex-col gap-1">
                 {week.map(day => (
                   <div
                     key={day.date}
