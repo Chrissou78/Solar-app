@@ -7,8 +7,7 @@ import { loadTranslations } from '@/lib/i18n'
 import { CheckCircle, Clock} from 'lucide-react'
 
 export default function Maintenance() {
-  const { language, mounted: langMounted } = useLanguage()
-  const [mounted] = useState(false)
+  const { language, mounted } = useLanguage()
   const { system, loading, error } = useSystem()
   const [setT] = useState<any>({})
   const [completedTasks, setCompletedTasks] = useState<number[]>([])
@@ -17,10 +16,10 @@ export default function Maintenance() {
   const [scheduledDate, setScheduledDate] = useState('')
 
   useEffect(() => {
-    if (langMounted) {
+    if (mounted) {
         loadTranslations(language).then(data => setT(data))
     }
-  }, [language, langMounted])
+  }, [language, mounted])
 
   const handleSchedule = (task: any) => {
     setSelectedTask(task)

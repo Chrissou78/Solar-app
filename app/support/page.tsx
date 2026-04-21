@@ -13,8 +13,7 @@ interface Message {
 }
 
 export default function Support() {
-  const { language, mounted: langMounted } = useLanguage()
-  const [mounted] = useState(false)
+  const { language, mounted } = useLanguage()
   const { system, loading, error } = useSystem()
   const [setT] = useState<any>({})
   const [messages, setMessages] = useState<Message[]>([
@@ -28,10 +27,10 @@ export default function Support() {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    if (langMounted) {
+    if (mounted) {
         loadTranslations(language).then(data => setT(data))
     }
-  }, [language, langMounted])
+  }, [language, mounted])
 
   const sendMessage = async () => {
     if (!inputValue.trim() || isLoading) return

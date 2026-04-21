@@ -8,17 +8,16 @@ import LanguageSwitcher from '@/components/LanguageSwitcher'
 import { Settings as SettingsIcon, Bell, Download } from 'lucide-react'
 
 export default function Settings() {
-  const { language, setLanguage, mounted: langMounted } = useLanguage()
-  const [mounted] = useState(false)
+  const { language, setLanguage, mounted } = useLanguage()
   const { system, loading, error } = useSystem()
   const [setT] = useState<any>({})
   const [notifications, setNotifications] = useState(true)
 
   useEffect(() => {
-    if (langMounted) {
+    if (mounted) {
         loadTranslations(language).then(data => setT(data))
     }
-  }, [language, langMounted])
+  }, [language, mounted])
 
   const handleLanguageChange = (lang: string) => {
     setLanguage(lang)

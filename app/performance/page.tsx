@@ -11,16 +11,15 @@ import EfficiencyMetrics from '@/components/Dashboard/EfficiencyMetrics'
 import { Download } from 'lucide-react'
 
 export default function Performance() {
-  const { language, mounted: langMounted } = useLanguage()
-  const [mounted] = useState(false)
+  const { language, mounted } = useLanguage()
   const { system, loading, error } = useSystem()
   const [setT] = useState<any>({})
 
   useEffect(() => {
-    if (langMounted) {
+    if (mounted) {
         loadTranslations(language).then(data => setT(data))
     }
-  }, [language, langMounted])
+  }, [language, mounted])
 
   if (!mounted || loading) {
     return (

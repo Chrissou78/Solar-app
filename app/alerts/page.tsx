@@ -7,18 +7,17 @@ import { loadTranslations } from '@/lib/i18n'
 import { AlertCircle, AlertTriangle, Info, X, ChevronDown, ChevronUp } from 'lucide-react'
 
 export default function Alerts() {
-  const { language, mounted: langMounted } = useLanguage()
-  const [mounted] = useState(false)
+  const { language, mounted } = useLanguage()
   const { system, loading, error } = useSystem()
-  const [setT] = useState<any>({})
+  const [t, setT] = useState<any>({})
   const [dismissedAlerts, setDismissedAlerts] = useState<number[]>([])
   const [expandedAlert, setExpandedAlert] = useState<number | null>(null)
 
   useEffect(() => {
-    if (langMounted) {
+    if (mounted) {
       loadTranslations(language).then(data => setT(data))
     }
-  }, [language, langMounted])
+  }, [language, mounted])
 
   const dismissAlert = (id: number) => {
     setDismissedAlerts([...dismissedAlerts, id])

@@ -1,26 +1,23 @@
 'use client'
-
-import { useEffect, useState } from 'react'
-import { getDefaultLanguage } from '@/lib/i18n'
+import { useState, useEffect } from 'react'
+import { getDefaultLanguage, SUPPORTED_LANGUAGES } from '@/lib/i18n'
 
 export function useLanguage() {
   const [language, setLanguage] = useState('en')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
     const defaultLang = getDefaultLanguage()
     setLanguage(defaultLang)
-
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'language' && e.newValue) {
-        setLanguage(e.newValue)
-      }
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
+    setMounted(true) // ← Add this line
   }, [])
 
-  return { language, setLanguage, mounted }
+  const handleSetLanguage = (lang: string) => {
+    if (SUPPORTED_LANGUAGES.includes(lang)) {
+      setLanguage(lang)
+      localStorage.setItem('language', lang)
+    }
+  }
+
+  return { language, setLanguage: handleSetLanguage, mounted }
 }
