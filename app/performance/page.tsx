@@ -67,7 +67,7 @@ export default function Performance() {
 
   // Calendar data
   const calendarData = system.daily_production.map((p) => ({
-    date: p.production_date,
+    date: new Date(p.production_date).toISOString().split('T')[0], // ← Format as YYYY-MM-DD
     production: p.kwh_produced,
     expected: p.expected_kwh,
   }))

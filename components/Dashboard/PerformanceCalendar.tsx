@@ -20,12 +20,12 @@ export default function PerformanceCalendar({ data }: PerformanceCalendarProps) 
       const date = new Date(today)
       date.setDate(date.getDate() - i)
       const dateStr = date.toISOString().split('T')[0]
-      const dayData = data.find(d => d.date === dateStr) || { production: 0, expected: 0, date: dateStr }
+      const dayData = data.find(d => d.date === dateStr)
+      
       days.push({
         date: dateStr,
-        production: dayData.production,
-        expected: dayData.expected,
-        dayOfWeek: date.toLocaleDateString('en-US', { weekday: 'short' }).charAt(0),
+        production: dayData?.production || 0,
+        expected: dayData?.expected || 0,
         dayOfMonth: date.getDate(),
       })
     }
@@ -50,7 +50,7 @@ export default function PerformanceCalendar({ data }: PerformanceCalendarProps) 
   }
 
   return (
-    <div className="rounded-xl border p-4 bg-white dark:bg-gray-900">
+    <div className="rounded-xl border p-4 bg-white dark:bg-gray-900" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
       <div className="flex items-center gap-2 mb-4">
         <TrendingUp className="w-5 h-5" style={{ color: 'var(--accent)' }} />
         <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
@@ -86,7 +86,7 @@ export default function PerformanceCalendar({ data }: PerformanceCalendarProps) 
             {weekLabels.map(day => (
               <div
                 key={day}
-                className="w-8 h-8 flex items-center justify-center text-xs font-semibold"
+                className="w-7 h-7 flex items-center justify-center text-xs font-semibold"
                 style={{ color: 'var(--text-secondary)' }}
               >
                 {day}
@@ -100,18 +100,14 @@ export default function PerformanceCalendar({ data }: PerformanceCalendarProps) 
               {week.map(day => (
                 <div
                   key={day.date}
-                  className={`w-8 h-8 rounded cursor-pointer transition-all hover:ring-2 hover:ring-offset-1 ${getColor(
+                  className={`w-7 h-7 rounded cursor-pointer transition-all hover:ring-2 hover:ring-offset-1 flex items-center justify-center text-xs font-bold ${getColor(
                     day.production,
                     day.expected
                   )}`}
                   title={`${day.date}: ${day.production.toFixed(1)} kWh (Expected: ${day.expected.toFixed(1)} kWh)`}
-                  style={{ color: 'white', fontSize: '10px' }}
+                  style={{ color: day.production > 0 ? 'white' : 'transparent' }}
                 >
-                  {day.production > 0 && (
-                    <div className="flex items-center justify-center h-full font-bold">
-                      {day.dayOfMonth}
-                    </div>
-                  )}
+                  {day.dayOfMonth}
                 </div>
               ))}
             </div>
@@ -120,16 +116,16 @@ export default function PerformanceCalendar({ data }: PerformanceCalendarProps) 
       </div>
 
       {/* Stats */}
-      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div>
-            <p style={{ color: 'var(--text-secondary)' }}>Avg. Production</p>
+            <p style={{ color: 'var(--text-secondary)' }}>Avg. Production (42d)</p>
             <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>
               {(calendarData.reduce((sum, d) => sum + d.production, 0) / calendarData.length).toFixed(1)} kWh
             </p>
           </div>
           <div>
-            <p style={{ color: 'var(--text-secondary)' }}>Total Production</p>
+            <p style={{ color: 'var(--text-secondary)' }}>Total Production (42d)</p>
             <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>
               {calendarData.reduce((sum, d) => sum + d.production, 0).toFixed(0)} kWh
             </p>
