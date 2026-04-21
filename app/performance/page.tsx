@@ -38,9 +38,9 @@ export default function Performance() {
     )
   }
 
-  const totalProduction = system.dailyProduction.reduce((sum, p) => sum + p.kwhProduced, 0)
-  const expectedProduction = system.dailyProduction.reduce((sum, p) => sum + p.expectedKwh, 0)
-  const daysTracked = system.dailyProduction.length
+  const totalProduction = system.daily_production.reduce((sum, p) => sum + p.kwh_produced, 0)
+  const expectedProduction = system.daily_production.reduce((sum, p) => sum + p.expected_kwh, 0)
+  const daysTracked = system.daily_production.length
 
   // Monthly data
   const monthlyData = []
@@ -50,12 +50,12 @@ export default function Performance() {
     const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
     const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
 
-    const monthProduction = system.dailyProduction
+    const monthProduction = system.daily_production
       .filter(p => {
-        const pDate = new Date(p.productionDate)
+        const pDate = new Date(p.production_date)
         return pDate >= monthStart && pDate <= monthEnd
       })
-      .reduce((sum, p) => sum + p.kwhProduced, 0)
+      .reduce((sum, p) => sum + p.kwh_produced, 0)
 
     monthlyData.push({
       month: date.toLocaleDateString(language === 'en' ? 'en-US' : language, { month: 'short' }),
@@ -65,19 +65,19 @@ export default function Performance() {
   }
 
   // Calendar data
-  const calendarData = system.dailyProduction
+  const calendarData = system.daily_production
     .map((p) => ({
-      date: new Date(p.productionDate).toLocaleDateString(language === 'en' ? 'en-US' : language, { month: 'short', day: 'numeric' }),
-      production: p.kwhProduced,
-      expected: p.expectedKwh,
-      dayOfMonth: new Date(p.productionDate).getDate(),
+      date: new Date(p.production_date).toLocaleDateString(language === 'en' ? 'en-US' : language, { month: 'short', day: 'numeric' }),
+      production: p.kwh_produced,
+      expected: p.expected_kwh,
+      dayOfMonth: new Date(p.production_date).getDate(),
     }))
 
   const downloadReport = () => {
     const report = {
-      system: system.systemName,
+      system: system.system_name,
       location: system.location,
-      size: system.systemSizeKw,
+      size: system.system_size_kw,
       totalProduction,
       expectedProduction,
       efficiency: ((totalProduction / expectedProduction) * 100).toFixed(1),
@@ -96,8 +96,8 @@ export default function Performance() {
       + `Days Tracked: ${report.daysTracked}\n\n`
       + `Daily Data\n`
       + `Date,Production (kWh),Expected (kWh)\n`
-      + system.dailyProduction.map(p => 
-        `${new Date(p.productionDate).toLocaleDateString()},${p.kwhProduced},${p.expectedKwh}`
+      + system.daily_production.map(p => 
+        `${new Date(p.production_date).toLocaleDateString()},${p.kwh_produced},${p.expected_kwh}`
       ).join('\n')
 
     const element = document.createElement('a')
@@ -167,7 +167,7 @@ export default function Performance() {
         {/* Efficiency Metrics */}
         <div className="mb-12">
           <EfficiencyMetrics
-            systemSizeKw={system.systemSizeKw}
+            system_size_kw={system.system_size_kw}
             totalProduction={totalProduction}
             expectedProduction={expectedProduction}
             daysTracked={daysTracked}
@@ -176,17 +176,17 @@ export default function Performance() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 gap-6 mb-12">
-            {system.dailyProduction && system.dailyProduction.length > 0 && (
+            {system.daily_production&& system.daily_production.length > 0 && (
                 <ProductionChart 
-                data={system.dailyProduction
+                data={system.daily_production
                     .reverse()
                     .map(p => ({
-                    date: new Date(p.productionDate).toLocaleDateString(language === 'en' ? 'en-US' : language, { 
+                    date: new Date(p.production_date).toLocaleDateString(language === 'en' ? 'en-US' : language, { 
                         month: 'short', 
                         day: 'numeric' 
                     }),
-                    actual: parseFloat(p.kwhProduced.toFixed(1)),
-                    expected: parseFloat(p.expectedKwh.toFixed(1)),
+                    actual: parseFloat(p.kwh_produced.toFixed(1)),
+                    expected: parseFloat(p.expected_kwh.toFixed(1)),
                     }))}
                 />
             )}

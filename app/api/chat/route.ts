@@ -13,10 +13,10 @@ export async function POST(request: Request) {
       system: `You are a helpful solar energy support assistant. You help users understand their solar system performance, maintenance, and energy savings. 
       
       Current System Information:
-      - System Name: ${systemInfo?.systemName || 'Unknown'}
-      - Size: ${systemInfo?.systemSizeKw || 'Unknown'}kW
+      - System Name: ${systemInfo?.system_name || 'Unknown'}
+      - Size: ${systemInfo?.system_size_kw || 'Unknown'}kW
       - Location: ${systemInfo?.location || 'Unknown'}
-      - Type: ${systemInfo?.inverterType || 'Unknown'}
+      - Type: ${systemInfo?.inverter_type || 'Unknown'}
       
       Be helpful, friendly, and provide actionable advice about solar systems.`,
       messages: [

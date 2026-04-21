@@ -1,14 +1,14 @@
 'use client'
 
 interface EfficiencyMetricsProps {
-  systemSizeKw: number
+  system_size_kw: number
   totalProduction: number
   expectedProduction: number
   daysTracked: number
 }
 
 export default function EfficiencyMetrics({
-  systemSizeKw,
+  system_size_kw,
   totalProduction,
   expectedProduction,
   daysTracked,
@@ -18,8 +18,8 @@ export default function EfficiencyMetrics({
     : '0'
   
   const avgDaily = daysTracked > 0 ? (totalProduction / daysTracked).toFixed(2) : '0'
-  const capacityFactor = systemSizeKw > 0
-    ? ((totalProduction / (systemSizeKw * daysTracked * 24)) * 100).toFixed(1)
+  const capacityFactor = system_size_kw > 0
+    ? ((totalProduction / (system_size_kw * daysTracked * 24)) * 100).toFixed(1)
     : '0'
 
   const metrics = [

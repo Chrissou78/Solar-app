@@ -77,7 +77,7 @@ npx tsx lib/fake-data.ts    # Seed database with 1-year data
 Main Tables
 - User: Authentication, language preference, theme
 - System: Solar system details, size, location, inverter type
-- DailyProduction: Historical production data (1 per day)
+- daily_production: Historical production data (1 per day)
 - Alert: System alerts (warnings, info)
 - MaintenanceTask: Scheduled maintenance tasks
 - SupportMessage: Chat history with escalation flag

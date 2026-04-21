@@ -20,7 +20,7 @@ interface MaintenanceTask {
   completed: boolean
 }
 
-interface DailyProduction {
+interface daily_production{
   production_date: string
   kwh_produced: number
   expected_kwh: number
@@ -35,7 +35,7 @@ interface System {
   installation_date: string
   alerts: Alert[]
   maintenance_tasks: MaintenanceTask[]
-  daily_production: DailyProduction[]
+  daily_production: daily_production[]
 }
 
 export function useSystem() {

@@ -63,7 +63,7 @@ export default function Settings() {
           }} className="rounded-lg border p-6 space-y-4">
             <div>
               <p style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium mb-1">System Name</p>
-              <p className="font-medium">{system.systemName}</p>
+              <p className="font-medium">{system.system_name}</p>
             </div>
             <div>
               <p style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium mb-1">Location</p>
@@ -71,16 +71,16 @@ export default function Settings() {
             </div>
             <div>
               <p style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium mb-1">System Size</p>
-              <p className="font-medium">{system.systemSizeKw}kW</p>
+              <p className="font-medium">{system.system_size_kw}kW</p>
             </div>
             <div>
               <p style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium mb-1">Inverter Type</p>
-              <p className="font-medium">{system.inverterType}</p>
+              <p className="font-medium">{system.inverter_type}</p>
             </div>
             <div>
               <p style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium mb-1">Installation Date</p>
               <p className="font-medium">
-                {new Date(system.installationDate).toLocaleDateString(language === 'en' ? 'en-US' : language)}
+                {new Date(system.installation_date).toLocaleDateString(language === 'en' ? 'en-US' : language)}
               </p>
             </div>
           </div>

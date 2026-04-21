@@ -28,7 +28,7 @@
     "monthlyPerformance": "Monatliche Leistung",
     "performanceCalendar": "Leistungskalender",
     "systemEfficiency": "Systemeffizienz",
-    "avgDailyProduction": "Durchschnittliche Tagesproduktion",
+    "avgdaily_production": "Durchschnittliche Tagesproduktion",
     "capacityFactor": "Kapazitätsfaktor",
     "totalProduction": "Gesamtproduktion",
     "actualVsExpected": "Tatsächlich vs. Erwartet",

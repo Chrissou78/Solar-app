@@ -56,11 +56,11 @@ export default function Maintenance() {
     )
   }
 
-  const upcomingTasks = system.maintenanceTasks
+  const upcomingTasks = system.maintenance_tasks
     .filter(t => !completedTasks.includes(t.id))
-    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+    .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
 
-  const completedTasksList = system.maintenanceTasks.filter(t => completedTasks.includes(t.id))
+  const completedTasksList = system.maintenance_tasks.filter(t => completedTasks.includes(t.id))
 
   return (
     <div style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }} className="min-h-screen">
@@ -86,7 +86,7 @@ export default function Maintenance() {
             <div className="space-y-4">
               {upcomingTasks.map((task) => {
                 const daysUntilDue = Math.ceil(
-                  (new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+                  (new Date(task.due_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
                 )
                 const isOverdue = daysUntilDue < 0
 

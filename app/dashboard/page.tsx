@@ -31,25 +31,25 @@ export default function Dashboard() {
   }, [])
 
   useEffect(() => {
-    if (!system || !system.dailyProduction) return
+    if (!system || !system.daily_production) return
 
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     
-    const todayData = system.dailyProduction.find(p => {
-      const prodDate = new Date(p.productionDate)
+    const todayData = system.daily_production.find(p => {
+      const prodDate = new Date(p.production_date)
       prodDate.setHours(0, 0, 0, 0)
       return prodDate.getTime() === today.getTime()
     })
 
-    setTodayProduction(todayData?.kwhProduced || 0)
+    setTodayProduction(todayData?.kwh_produced || 0)
 
     const now = new Date()
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
     
-    const monthTotal = system.dailyProduction
-      .filter(p => new Date(p.productionDate) >= monthStart)
-      .reduce((sum, p) => sum + p.kwhProduced, 0)
+    const monthTotal = system.daily_production
+      .filter(p => new Date(p.production_date) >= monthStart)
+      .reduce((sum, p) => sum + p.kwh_produced, 0)
 
     setMonthlyProduction(monthTotal)
   }, [system])
@@ -81,12 +81,12 @@ export default function Dashboard() {
     const monthStart = new Date(date.getFullYear(), date.getMonth(), 1)
     const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
 
-    const monthProduction = system.dailyProduction
+    const monthProduction = system.daily_production
       .filter(p => {
-        const pDate = new Date(p.productionDate)
+        const pDate = new Date(p.production_date)
         return pDate >= monthStart && pDate <= monthEnd
       })
-      .reduce((sum, p) => sum + p.kwhProduced, 0)
+      .reduce((sum, p) => sum + p.kwh_produced, 0)
 
     monthlyData.push({
       month: date.toLocaleDateString(language === 'en' ? 'en-US' : language, { month: 'short' }),
@@ -96,20 +96,20 @@ export default function Dashboard() {
   }
 
   // Performance calendar data
-  const calendarData = system.dailyProduction
+  const calendarData = system.daily_production
     .slice(-30)
     .reverse()
     .map((p) => ({
-      date: new Date(p.productionDate).toLocaleDateString(language === 'en' ? 'en-US' : language, { month: 'short', day: 'numeric' }),
-      production: p.kwhProduced,
-      expected: p.expectedKwh,
-      dayOfMonth: new Date(p.productionDate).getDate(),
+      date: new Date(p.production_date).toLocaleDateString(language === 'en' ? 'en-US' : language, { month: 'short', day: 'numeric' }),
+      production: p.kwh_produced,
+      expected: p.expected_kwh,
+      dayOfMonth: new Date(p.production_date).getDate(),
     }))
 
   // Efficiency metrics
-  const totalProduction = system.dailyProduction.reduce((sum, p) => sum + p.kwhProduced, 0)
-  const expectedProduction = system.dailyProduction.reduce((sum, p) => sum + p.expectedKwh, 0)
-  const daysTracked = system.dailyProduction.length
+  const totalProduction = system.daily_production.reduce((sum, p) => sum + p.kwh_produced, 0)
+  const expectedProduction = system.daily_production.reduce((sum, p) => sum + p.expected_kwh, 0)
+  const daysTracked = system.daily_production.length
 
   return (
     <div style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }} className="min-h-screen">
@@ -117,10 +117,10 @@ export default function Dashboard() {
         {/* Welcome Section */}
         <div className="mb-12">
           <h2 className="text-4xl font-bold mb-2" style={{ color: '#3b82f6' }}>
-            {t.dashboard?.welcomeBack || 'Welcome back'}, {system.systemName}!
+            {t.dashboard?.welcomeBack || 'Welcome back'}, {system.system_name}!
           </h2>
           <p style={{ color: 'var(--text-secondary)' }}>
-            {system.location} • {system.systemSizeKw}kW {system.inverterType}
+            {system.location} • {system.system_size_kw}kW {system.inverter_type}
           </p>
         </div>
 
@@ -209,7 +209,7 @@ export default function Dashboard() {
         {/* Efficiency Metrics */}
         <div className="mb-8">
           <EfficiencyMetrics
-            systemSizeKw={system.systemSizeKw}
+            system_size_kw={system.system_size_kw}
             totalProduction={totalProduction}
             expectedProduction={expectedProduction}
             daysTracked={daysTracked}
@@ -219,18 +219,18 @@ export default function Dashboard() {
         {/* Charts Grid */}
         <div className="grid grid-cols-1 gap-6 mb-8">
           {/* Production Trend Chart */}
-          {system.dailyProduction && system.dailyProduction.length > 0 && (
+          {system.daily_production&& system.daily_production.length > 0 && (
             <ProductionChart 
-              data={system.dailyProduction
+              data={system.daily_production
                 .slice(-30)
                 .reverse()
                 .map(p => ({
-                  date: new Date(p.productionDate).toLocaleDateString(language === 'en' ? 'en-US' : language, { 
+                  date: new Date(p.production_date).toLocaleDateString(language === 'en' ? 'en-US' : language, { 
                     month: 'short', 
                     day: 'numeric' 
                   }),
-                  actual: parseFloat(p.kwhProduced.toFixed(1)),
-                  expected: parseFloat(p.expectedKwh.toFixed(1)),
+                  actual: parseFloat(p.kwh_produced.toFixed(1)),
+                  expected: parseFloat(p.expected_kwh.toFixed(1)),
                 }))}
             />
           )}
@@ -299,9 +299,9 @@ export default function Dashboard() {
                     {t.dashboard?.nextMaintenance || 'Next Maintenance'}
                   </h3>
                 </div>
-                {system.maintenanceTasks.length > 0 && system.maintenanceTasks.filter(t => !t.completed).slice(0, 1).map((task) => {
+                {system.maintenance_tasks.length > 0 && system.maintenance_tasks.filter(t => !t.completed).slice(0, 1).map((task) => {
                   const daysUntilDue = Math.ceil(
-                    (new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+                    (new Date(task.due_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
                   )
                   return (
                     <div key={task.id}>
