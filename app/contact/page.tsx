@@ -15,7 +15,7 @@ interface Message {
 export default function Contact() {
   const { language, mounted } = useLanguage()
   const { system, loading, error } = useSystem()
-  const [t, setT] = useState<any>({})
+  const [setT] = useState<any>({})
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',

@@ -9,7 +9,7 @@ import { AlertCircle, AlertTriangle, Info, X, ChevronDown, ChevronUp } from 'luc
 export default function Alerts() {
   const { language, mounted } = useLanguage()
   const { system, loading, error } = useSystem()
-  const [t, setT] = useState<any>({})
+  const [setT] = useState<any>({})
   const [dismissedAlerts, setDismissedAlerts] = useState<number[]>([])
   const [expandedAlert, setExpandedAlert] = useState<number | null>(null)
 
