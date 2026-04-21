@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
-    "@prisma/client": "^5.22.0",
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.104.0",
     "axios": "^1.15.1",
     "dotenv": "^17.4.2",
     "i18next": "^26.0.6",
@@ -20,7 +21,6 @@
     "next": "16.2.4",
     "next-auth": "^4.24.14",
     "next-i18next": "^16.0.5",
-    "prisma": "^5.22.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1"
