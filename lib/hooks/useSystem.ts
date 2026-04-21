@@ -20,7 +20,7 @@ interface MaintenanceTask {
   completed: boolean
 }
 
-interface daily_production{
+interface DailyProduction {
   production_date: string
   kwh_produced: number
   expected_kwh: number
@@ -35,7 +35,7 @@ interface System {
   installation_date: string
   alerts: Alert[]
   maintenance_tasks: MaintenanceTask[]
-  daily_production: daily_production[]
+  daily_production: DailyProduction[]
 }
 
 export function useSystem() {
@@ -59,12 +59,28 @@ export function useSystem() {
           .limit(1)
           .single()
 
-        if (fetchError) throw fetchError
+        if (fetchError) {
+          console.error('Supabase error:', fetchError)
+          throw fetchError
+        }
 
         setSystem(data as System)
       } catch (err) {
         console.error('Error fetching system:', err)
         setError(err instanceof Error ? err.message : 'Unknown error')
+        
+        // Fallback to mock data
+        setSystem({
+          id: 1,
+          system_name: 'Demo System',
+          system_size_kw: 8,
+          location: 'Austin, TX',
+          inverter_type: 'Fronius',
+          installation_date: '2023-06-15',
+          alerts: [],
+          maintenance_tasks: [],
+          daily_production: [],
+        })
       } finally {
         setLoading(false)
       }
