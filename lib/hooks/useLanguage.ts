@@ -7,9 +7,11 @@ export function useLanguage() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    // Get initial language on mount
-    const defaultLang = getDefaultLanguage()
+    // Get initial language from localStorage or browser
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('language') : null
+    const defaultLang = saved || getDefaultLanguage()
     setLanguageState(defaultLang)
+    localStorage.setItem('language', defaultLang)
     setMounted(true)
   }, [])
 
@@ -17,11 +19,10 @@ export function useLanguage() {
     if (SUPPORTED_LANGUAGES.includes(lang)) {
       setLanguageState(lang)
       localStorage.setItem('language', lang)
-      // Dispatch custom event to sync across tabs/components
+      // Dispatch storage event to sync across components
       window.dispatchEvent(new StorageEvent('storage', {
         key: 'language',
         newValue: lang,
-        oldValue: language,
         storageArea: localStorage,
       }))
     }
@@ -30,7 +31,7 @@ export function useLanguage() {
   // Listen for language changes from other tabs/components
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'language' && e.newValue) {
+      if (e.key === 'language' && e.newValue && SUPPORTED_LANGUAGES.includes(e.newValue)) {
         setLanguageState(e.newValue)
       }
     }

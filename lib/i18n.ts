@@ -6,7 +6,9 @@ export function getDefaultLanguage(): string {
   if (typeof window === 'undefined') return 'en'
   
   const saved = localStorage.getItem('language')
-  if (saved && SUPPORTED_LANGUAGES.includes(saved)) return saved
+  if (saved && SUPPORTED_LANGUAGES.includes(saved)) {
+    return saved
+  }
   
   const browserLang = navigator.language.toLowerCase().split('-')[0]
   if (SUPPORTED_LANGUAGES.includes(browserLang)) {
