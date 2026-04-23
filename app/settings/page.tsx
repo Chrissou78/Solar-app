@@ -1,29 +1,144 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useSystem } from '@/lib/hooks/useSystem'
+import { useAuth } from '@/lib/hooks/useAuth'
 import { useLanguage } from '@/lib/hooks/useLanguage'
 import { loadTranslations } from '@/lib/i18n'
-import LanguageSwitcher from '@/components/LanguageSwitcher'
-import { Settings as SettingsIcon, Bell, Download } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import { User, Lock, Zap, Save } from 'lucide-react'
+
+const ENERGY_PROVIDERS = [
+  { value: 'solar_edge', label: 'SolarEdge' },
+  { value: 'fronius', label: 'Fronius' },
+  { value: 'enphase', label: 'Enphase' },
+  { value: 'string_kicker', label: 'String Kicker' },
+  { value: 'sma', label: 'SMA' },
+  { value: 'victron', label: 'Victron' },
+  { value: 'growatt', label: 'Growatt' },
+  { value: 'tesla_powerwall', label: 'Tesla Powerwall' },
+]
 
 export default function Settings() {
-  const { language, setLanguage, mounted } = useLanguage()
-  const { system, loading, error } = useSystem()
-  const [setT] = useState<any>({})
-  const [notifications, setNotifications] = useState(true)
+  const { language, mounted: langMounted } = useLanguage()
+  const { user, profile, appSettings, loading: authLoading } = useAuth()
+  const [t, setT] = useState<any>({})
+  const [mounted, setMounted] = useState(false)
+
+  // User profile state
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [birthDate, setBirthDate] = useState('')
+  const [profileLoading, setProfileLoading] = useState(false)
+  const [profileSuccess, setProfileSuccess] = useState(false)
+
+  // App settings state
+  const [provider, setProvider] = useState('')
+  const [apiKey, setApiKey] = useState('')
+  const [apiEndpoint, setApiEndpoint] = useState('')
+  const [settingsLoading, setSettingsLoading] = useState(false)
+  const [settingsSuccess, setSettingsSuccess] = useState(false)
+
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (mounted) {
-        loadTranslations(language).then(data => setT(data))
+    if (langMounted) {
+      loadTranslations(language).then(data => setT(data))
     }
-  }, [language, mounted])
+  }, [language, langMounted])
 
-  const handleLanguageChange = (lang: string) => {
-    setLanguage(lang)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (profile) {
+      setFirstName(profile.first_name || '')
+      setLastName(profile.last_name || '')
+      setBirthDate(profile.birth_date || '')
+    }
+    if (appSettings) {
+      setProvider(appSettings.energy_provider || '')
+      setApiKey(appSettings.api_key || '')
+      setApiEndpoint(appSettings.api_endpoint || '')
+    }
+  }, [profile, appSettings])
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!user) return
+
+    setProfileLoading(true)
+    setError(null)
+    setProfileSuccess(false)
+
+    try {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: firstName,
+          last_name: lastName,
+          birth_date: birthDate || null,
+        })
+        .eq('id', user.id)
+
+      if (error) throw error
+      setProfileSuccess(true)
+      setTimeout(() => setProfileSuccess(false), 3000)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setProfileLoading(false)
+    }
   }
 
-  if (!mounted || loading) {
+  const handleUpdateSettings = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!user) return
+
+    setSettingsLoading(true)
+    setError(null)
+    setSettingsSuccess(false)
+
+    try {
+      const supabase = createClient()
+
+      if (appSettings?.id) {
+        // Update existing
+        const { error } = await supabase
+          .from('app_settings')
+          .update({
+            energy_provider: provider || null,
+            api_key: apiKey || null,
+            api_endpoint: apiEndpoint || null,
+          })
+          .eq('id', appSettings.id)
+
+        if (error) throw error
+      } else {
+        // Insert new
+        const { error } = await supabase
+          .from('app_settings')
+          .insert({
+            user_id: user.id,
+            energy_provider: provider || null,
+            api_key: apiKey || null,
+            api_endpoint: apiEndpoint || null,
+          })
+
+        if (error) throw error
+      }
+
+      setSettingsSuccess(true)
+      setTimeout(() => setSettingsSuccess(false), 3000)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setSettingsLoading(false)
+    }
+  }
+
+  if (!mounted || !langMounted || authLoading) {
     return (
       <div style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }} className="min-h-screen flex items-center justify-center">
         <p>Loading...</p>
@@ -31,10 +146,10 @@ export default function Settings() {
     )
   }
 
-  if (error || !system) {
+  if (!user) {
     return (
       <div style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }} className="min-h-screen flex items-center justify-center">
-        <p>Error: {error || 'System not found'}</p>
+        <p>Please log in to access settings</p>
       </div>
     )
   }
@@ -42,110 +157,164 @@ export default function Settings() {
   return (
     <div style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }} className="min-h-screen">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-2 flex items-center gap-2" style={{ color: '#3b82f6' }}>
-            <SettingsIcon size={32} />
-            Settings
-          </h1>
-          <p style={{ color: 'var(--text-secondary)' }}>
-            Manage your preferences and account settings
-          </p>
-        </div>
+        <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--accent)' }}>Settings</h1>
+        <p style={{ color: 'var(--text-secondary)' }} className="mb-12">Manage your profile and application settings</p>
 
-        {/* System Information */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">System Information</h2>
-          <div style={{
-            backgroundColor: 'var(--bg-secondary)',
-            borderColor: 'var(--border-color)',
-          }} className="rounded-lg border p-6 space-y-4">
-            <div>
-              <p style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium mb-1">System Name</p>
-              <p className="font-medium">{system.system_name}</p>
+        {error && (
+          <div className="p-4 rounded-lg bg-red-500/20 text-red-500 mb-8">
+            {error}
+          </div>
+        )}
+
+        {/* User Information */}
+        <div className="rounded-xl border p-8 mb-8" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
+          <div className="flex items-center gap-3 mb-6">
+            <User className="w-6 h-6" style={{ color: 'var(--accent)' }} />
+            <h2 className="text-2xl font-semibold">User Information</h2>
+          </div>
+
+          <form onSubmit={handleUpdateProfile} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="John"
+                  className="w-full px-4 py-2 rounded-lg outline-none" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Doe"
+                  className="w-full px-4 py-2 rounded-lg outline-none" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
+                />
+              </div>
             </div>
+
             <div>
-              <p style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium mb-1">Location</p>
-              <p className="font-medium">{system.location}</p>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                Birth Date
+              </label>
+              <input
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg outline-none" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
+              />
             </div>
+
             <div>
-              <p style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium mb-1">System Size</p>
-              <p className="font-medium">{system.system_size_kw}kW</p>
-            </div>
-            <div>
-              <p style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium mb-1">Inverter Type</p>
-              <p className="font-medium">{system.inverter_type}</p>
-            </div>
-            <div>
-              <p style={{ color: 'var(--text-secondary)' }} className="text-sm font-medium mb-1">Installation Date</p>
-              <p className="font-medium">
-                {new Date(system.installation_date).toLocaleDateString(language === 'en' ? 'en-US' : language)}
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                Email
+              </label>
+              <input
+                type="email"
+                value={user.email || ''}
+                disabled
+                className="w-full px-4 py-2 rounded-lg outline-none opacity-50 cursor-not-allowed" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
+              />
+              <p style={{ color: 'var(--text-secondary)' }} className="text-xs mt-2">
+                Email cannot be changed
               </p>
             </div>
-          </div>
-        </div>
 
-        {/* Preferences */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-4">Preferences</h2>
-          <div style={{
-            backgroundColor: 'var(--bg-secondary)',
-            borderColor: 'var(--border-color)',
-          }} className="rounded-lg border p-6 space-y-6">
-            {/* Language */}
-            <div className="flex items-center justify-between pb-6 border-b" style={{ borderColor: 'var(--border-color)' }}>
-              <div>
-                <p className="font-medium">Language</p>
-                <p style={{ color: 'var(--text-secondary)' }} className="text-sm">Choose your preferred language</p>
+            {profileSuccess && (
+              <div className="p-3 rounded-lg bg-green-500/20 text-green-500 text-sm">
+                Profile updated successfully!
               </div>
-              <LanguageSwitcher currentLang={language} onChange={handleLanguageChange} />
-            </div>
+            )}
 
-            {/* Notifications */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Bell size={20} style={{ color: '#3b82f6' }} />
-                <div>
-                  <p className="font-medium">Notifications</p>
-                  <p style={{ color: 'var(--text-secondary)' }} className="text-sm">Receive system alerts</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setNotifications(!notifications)}
-                style={{
-                  backgroundColor: notifications ? '#10b981' : '#9ca3af',
-                }}
-                className="relative inline-flex h-8 w-14 items-center rounded-full transition"
-              >
-                <span
-                  style={{
-                    transform: notifications ? 'translateX(28px)' : 'translateX(2px)',
-                  }}
-                  className="inline-block h-6 w-6 transform rounded-full bg-white transition"
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Data */}
-        <div>
-          <h2 className="text-xl font-bold mb-4">Data</h2>
-          <div style={{
-            backgroundColor: 'var(--bg-secondary)',
-            borderColor: 'var(--border-color)',
-          }} className="rounded-lg border p-6">
-            <button style={{
-              backgroundColor: '#3b82f6',
-              color: '#fff',
-            }} className="flex items-center gap-2 px-4 py-3 rounded-lg hover:opacity-80 transition font-medium">
-              <Download size={20} />
-              Export My Data
+            <button
+              type="submit"
+              disabled={profileLoading}
+              style={{ backgroundColor: 'var(--accent)' }}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold hover:opacity-80 transition disabled:opacity-50"
+            >
+              <Save size={18} />
+              {profileLoading ? 'Saving...' : 'Save Profile'}
             </button>
-            <p style={{ color: 'var(--text-secondary)' }} className="text-sm mt-3">
-              Download all your system data in CSV format
-            </p>
+          </form>
+        </div>
+
+        {/* App Settings */}
+        <div className="rounded-xl border p-8" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
+          <div className="flex items-center gap-3 mb-6">
+            <Zap className="w-6 h-6" style={{ color: 'var(--accent)' }} />
+            <h2 className="text-2xl font-semibold">Energy Provider Settings</h2>
           </div>
+
+          <form onSubmit={handleUpdateSettings} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                Energy Provider
+              </label>
+              <select
+                value={provider}
+                onChange={(e) => setProvider(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg outline-none" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
+              >
+                <option value="">Select a provider...</option>
+                {ENERGY_PROVIDERS.map(p => (
+                  <option key={p.value} value={p.value}>{p.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                API Key
+              </label>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                <Lock size={18} style={{ color: 'var(--text-secondary)' }} />
+                <input
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="Enter your API key"
+                  className="bg-transparent flex-1 outline-none" style={{ color: 'var(--text-primary)' }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                API Endpoint
+              </label>
+              <input
+                type="text"
+                value={apiEndpoint}
+                onChange={(e) => setApiEndpoint(e.target.value)}
+                placeholder="https://api.provider.com/v1"
+                className="w-full px-4 py-2 rounded-lg outline-none" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
+              />
+            </div>
+
+            {settingsSuccess && (
+              <div className="p-3 rounded-lg bg-green-500/20 text-green-500 text-sm">
+                Settings updated successfully!
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={settingsLoading}
+              style={{ backgroundColor: 'var(--accent)' }}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold hover:opacity-80 transition disabled:opacity-50"
+            >
+              <Save size={18} />
+              {settingsLoading ? 'Saving...' : 'Save Settings'}
+            </button>
+          </form>
         </div>
       </div>
     </div>

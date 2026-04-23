@@ -1,72 +1,82 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Moon, Sun } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { useLanguage } from '@/lib/hooks/useLanguage'
+import { useAuth } from '@/lib/hooks/useAuth'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
+import { LogOut, Settings, User } from 'lucide-react'
 
 export default function Header() {
-  const [isDark, setIsDark] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const { language, setLanguage, mounted: langMounted } = useLanguage()
+  const { language, setLanguage } = useLanguage()
+  const { user } = useAuth()
+  const router = useRouter()
+  const [showMenu, setShowMenu] = useState(false)
 
-  const languages = [
-    { code: 'en', label: 'English', flag: '🇺🇸' },
-    { code: 'es', label: 'Español', flag: '🇪🇸' },
-    { code: 'fr', label: 'Français', flag: '🇫🇷' },
-    { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
-    { code: 'pt', label: 'Português', flag: '🇵🇹' },
-  ]
-
-  useEffect(() => {
-    setMounted(true)
-    const isDarkMode = document.documentElement.classList.contains('dark')
-    setIsDark(isDarkMode)
-  }, [])
-
-  const toggleTheme = () => {
-    const newDark = !isDark
-    setIsDark(newDark)
-    if (newDark) document.documentElement.classList.add('dark')
-    else document.documentElement.classList.remove('dark')
-    localStorage.setItem('theme', newDark ? 'dark' : 'light')
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/auth/login')
   }
-
-  const handleLanguageChange = (newLang: string) => {
-    setLanguage(newLang)
-    localStorage.setItem('language', newLang)
-  }
-
-  if (!mounted || !langMounted) return null
 
   return (
-    <header className="sticky top-0 z-50" style={{ backgroundColor: 'var(--bg-secondary)', borderBottomColor: 'var(--border-color)', borderBottomWidth: '1px' }}>
+    <header style={{ backgroundColor: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-color)' }} className="sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-blue-500">☀️ Virtual Energy</h1>
-        
+        <h1 className="text-xl font-bold" style={{ color: 'var(--accent)' }}>Virtual Energy</h1>
+
         <div className="flex items-center gap-4">
           {/* Language Selector */}
-          <select 
-            value={language} 
-            onChange={(e) => handleLanguageChange(e.target.value)}
-            style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }}
-            className="px-3 py-2 rounded-lg border text-sm font-medium hover:opacity-80 transition"
+          <select
+            value={language}
+            onChange={(e) => {
+              setLanguage(e.target.value)
+              localStorage.setItem('language', e.target.value)
+            }}
+            className="px-3 py-1 rounded text-sm outline-none" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
           >
-            {languages.map(lang => (
-              <option key={lang.code} value={lang.code}>
-                {lang.flag} {lang.label}
-              </option>
-            ))}
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="pt">Português</option>
           </select>
 
-          {/* Theme Toggle */}
-          <button 
-            onClick={toggleTheme}
-            style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }}
-            className="p-2 rounded-lg border hover:opacity-80 transition"
-            aria-label="Toggle theme"
-          >
-            {isDark ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} />}
-          </button>
+          {/* User Menu */}
+          {user && (
+            <div className="relative">
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:opacity-80 transition"
+                style={{ backgroundColor: 'var(--bg-tertiary)' }}
+              >
+                <User size={18} />
+                <span className="text-sm">{user.email?.split('@')[0]}</span>
+              </button>
+
+              {showMenu && (
+                <div className="absolute right-0 mt-2 w-48 rounded-lg border shadow-lg" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
+                  <button
+                    onClick={() => {
+                      router.push('/settings')
+                      setShowMenu(false)
+                    }}
+                    className="flex items-center gap-2 w-full px-4 py-2 hover:opacity-80 transition rounded-t-lg"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    <Settings size={16} />
+                    Settings
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 w-full px-4 py-2 hover:opacity-80 transition rounded-b-lg text-red-500"
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </header>
