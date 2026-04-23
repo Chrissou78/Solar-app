@@ -8,31 +8,43 @@ import { useRouter } from 'next/navigation'
 import { LogOut, Settings, User } from 'lucide-react'
 
 export default function Header() {
-  const { language, setLanguage } = useLanguage()
-  const { user } = useAuth()
+  const { language, setLanguage, mounted } = useLanguage()
+  const { user, loading } = useAuth()
   const router = useRouter()
   const [showMenu, setShowMenu] = useState(false)
+
+  const handleLanguageChange = (newLang: string) => {
+    setLanguage(newLang)
+    // Force page refresh to reload translations
+    window.location.reload()
+  }
 
   const handleLogout = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
+    setShowMenu(false)
     router.push('/auth/login')
   }
+
+  if (!mounted) return null
 
   return (
     <header style={{ backgroundColor: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-color)' }} className="sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold" style={{ color: 'var(--accent)' }}>Virtual Energy</h1>
+        <h1 
+          className="text-xl font-bold cursor-pointer hover:opacity-80 transition"
+          onClick={() => router.push('/')}
+          style={{ color: 'var(--accent)' }}>
+          Virtual Energy
+        </h1>
 
         <div className="flex items-center gap-4">
           {/* Language Selector */}
           <select
             value={language}
-            onChange={(e) => {
-              setLanguage(e.target.value)
-              localStorage.setItem('language', e.target.value)
-            }}
-            className="px-3 py-1 rounded text-sm outline-none" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
+            onChange={(e) => handleLanguageChange(e.target.value)}
+            className="px-3 py-2 rounded text-sm outline-none font-medium" 
+            style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
           >
             <option value="en">English</option>
             <option value="es">Español</option>
@@ -41,8 +53,8 @@ export default function Header() {
             <option value="pt">Português</option>
           </select>
 
-          {/* User Menu */}
-          {user && (
+          {/* User Menu - Only show if authenticated */}
+          {!loading && user && (
             <div className="relative">
               <button
                 onClick={() => setShowMenu(!showMenu)}
@@ -76,6 +88,17 @@ export default function Header() {
                 </div>
               )}
             </div>
+          )}
+
+          {/* Login button if not authenticated */}
+          {!loading && !user && (
+            <button
+              onClick={() => router.push('/auth/login')}
+              style={{ backgroundColor: 'var(--accent)' }}
+              className="px-4 py-2 rounded-lg text-white font-semibold hover:opacity-80 transition"
+            >
+              Sign In
+            </button>
           )}
         </div>
       </div>
