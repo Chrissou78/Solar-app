@@ -40,6 +40,7 @@ export default function Settings() {
 
   const [error, setError] = useState<string | null>(null)
 
+  // Load translations
   useEffect(() => {
     if (langMounted) {
       loadTranslations(language).then(data => setT(data))
@@ -157,8 +158,12 @@ export default function Settings() {
   return (
     <div style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }} className="min-h-screen">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--accent)' }}>Settings</h1>
-        <p style={{ color: 'var(--text-secondary)' }} className="mb-12">Manage your profile and application settings</p>
+        <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--accent)' }}>
+          {t.settings?.title || 'Settings'}
+        </h1>
+        <p style={{ color: 'var(--text-secondary)' }} className="mb-12">
+          {t.settings?.description || 'Manage your profile and application settings'}
+        </p>
 
         {error && (
           <div className="p-4 rounded-lg bg-red-500/20 text-red-500 mb-8">
@@ -170,14 +175,16 @@ export default function Settings() {
         <div className="rounded-xl border p-8 mb-8" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
           <div className="flex items-center gap-3 mb-6">
             <User className="w-6 h-6" style={{ color: 'var(--accent)' }} />
-            <h2 className="text-2xl font-semibold">User Information</h2>
+            <h2 className="text-2xl font-semibold">
+              {t.settings?.userInformation || 'User Information'}
+            </h2>
           </div>
 
           <form onSubmit={handleUpdateProfile} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                  First Name
+                  {t.settings?.firstName || 'First Name'}
                 </label>
                 <input
                   type="text"
@@ -189,7 +196,7 @@ export default function Settings() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Last Name
+                  {t.settings?.lastName || 'Last Name'}
                 </label>
                 <input
                   type="text"
@@ -203,7 +210,7 @@ export default function Settings() {
 
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                Birth Date
+                {t.settings?.birthDate || 'Birth Date'}
               </label>
               <input
                 type="date"
@@ -215,7 +222,7 @@ export default function Settings() {
 
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                Email
+                {t.settings?.email || 'Email'}
               </label>
               <input
                 type="email"
@@ -224,13 +231,13 @@ export default function Settings() {
                 className="w-full px-4 py-2 rounded-lg outline-none opacity-50 cursor-not-allowed" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
               />
               <p style={{ color: 'var(--text-secondary)' }} className="text-xs mt-2">
-                Email cannot be changed
+                {t.settings?.emailCannotChange || 'Email cannot be changed'}
               </p>
             </div>
 
             {profileSuccess && (
               <div className="p-3 rounded-lg bg-green-500/20 text-green-500 text-sm">
-                Profile updated successfully!
+                {t.settings?.profileUpdated || 'Profile updated successfully!'}
               </div>
             )}
 
@@ -241,7 +248,7 @@ export default function Settings() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold hover:opacity-80 transition disabled:opacity-50"
             >
               <Save size={18} />
-              {profileLoading ? 'Saving...' : 'Save Profile'}
+              {profileLoading ? t.settings?.saving || 'Saving...' : t.settings?.saveProfile || 'Save Profile'}
             </button>
           </form>
         </div>
@@ -250,20 +257,22 @@ export default function Settings() {
         <div className="rounded-xl border p-8" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
           <div className="flex items-center gap-3 mb-6">
             <Zap className="w-6 h-6" style={{ color: 'var(--accent)' }} />
-            <h2 className="text-2xl font-semibold">Energy Provider Settings</h2>
+            <h2 className="text-2xl font-semibold">
+              {t.settings?.energyProvider || 'Energy Provider Settings'}
+            </h2>
           </div>
 
           <form onSubmit={handleUpdateSettings} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                Energy Provider
+                {t.settings?.provider || 'Energy Provider'}
               </label>
               <select
                 value={provider}
                 onChange={(e) => setProvider(e.target.value)}
                 className="w-full px-4 py-2 rounded-lg outline-none" style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
               >
-                <option value="">Select a provider...</option>
+                <option value="">{t.settings?.selectProvider || 'Select a provider...'}</option>
                 {ENERGY_PROVIDERS.map(p => (
                   <option key={p.value} value={p.value}>{p.label}</option>
                 ))}
@@ -272,7 +281,7 @@ export default function Settings() {
 
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                API Key
+                {t.settings?.apiKey || 'API Key'}
               </label>
               <div className="flex items-center gap-2 px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
                 <Lock size={18} style={{ color: 'var(--text-secondary)' }} />
@@ -280,7 +289,7 @@ export default function Settings() {
                   type="password"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Enter your API key"
+                  placeholder={t.settings?.enterApiKey || 'Enter your API key'}
                   className="bg-transparent flex-1 outline-none" style={{ color: 'var(--text-primary)' }}
                 />
               </div>
@@ -288,7 +297,7 @@ export default function Settings() {
 
             <div>
               <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                API Endpoint
+                {t.settings?.apiEndpoint || 'API Endpoint'}
               </label>
               <input
                 type="text"
@@ -301,7 +310,7 @@ export default function Settings() {
 
             {settingsSuccess && (
               <div className="p-3 rounded-lg bg-green-500/20 text-green-500 text-sm">
-                Settings updated successfully!
+                {t.settings?.settingsUpdated || 'Settings updated successfully!'}
               </div>
             )}
 
@@ -312,7 +321,7 @@ export default function Settings() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-white font-semibold hover:opacity-80 transition disabled:opacity-50"
             >
               <Save size={18} />
-              {settingsLoading ? 'Saving...' : 'Save Settings'}
+              {settingsLoading ? t.settings?.saving || 'Saving...' : t.settings?.saveSettings || 'Save Settings'}
             </button>
           </form>
         </div>
